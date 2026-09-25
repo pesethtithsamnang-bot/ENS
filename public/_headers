@@ -1,0 +1,15 @@
+# index.html must always be revalidated - it references hashed JS/CSS
+# filenames that change on every deploy. If a browser or intermediate
+# cache serves a stale index.html after a new deploy, it points at asset
+# filenames that may no longer exist, and the app fails to load entirely -
+# exactly the "stuck on the loading screen forever" symptom.
+/index.html
+  Cache-Control: no-cache, must-revalidate
+
+/
+  Cache-Control: no-cache, must-revalidate
+
+# Hashed filenames are safe to cache forever - a new deploy always
+# produces new filenames, so there's no staleness risk here.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

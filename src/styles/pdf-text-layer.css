@@ -1,0 +1,32 @@
+/* Minimal text layer styling for pdf.js - lets rendered PDF text be
+   selected and copied, invisibly overlaid on the canvas image. This is a
+   trimmed version of pdf.js's own pdf_viewer.css (which is ~230KB and
+   meant for a full toolbar/sidebar viewer we don't use). */
+
+.textLayer {
+  position: absolute;
+  text-align: initial;
+  inset: 0;
+  overflow: clip;
+  opacity: 1;
+  line-height: 1;
+  text-size-adjust: none;
+  transform-origin: 0 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.textLayer span,
+.textLayer br {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+  user-select: text;
+  pointer-events: auto;
+}
+
+.textLayer ::selection {
+  background: rgba(0, 100, 255, 0.3);
+}

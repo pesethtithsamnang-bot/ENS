@@ -1,0 +1,192 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #121214;
+  --color-paper: #ffffff;
+  --color-surface: #f3f4ee;
+  --color-red: #e1152b;
+  --color-red-dark: #b00e20;
+  --color-plum: #7a1030;
+  --color-grey: #66646a;
+  --color-amber: #e8a63a;
+  --color-green: #1f7a48;
+
+  --font-serif: "Roboto", sans-serif;
+  --font-sans: "Roboto", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+/* Sitewide: dial down the heaviness of "bold" text. This affects every
+   font-bold/font-extrabold/font-semibold usage across the whole app at
+   once, matching a lighter, more YouTube-like weight scale, without
+   needing to touch every individual component. */
+.font-semibold { font-weight: 500 !important; }
+.font-bold { font-weight: 600 !important; }
+.font-extrabold { font-weight: 700 !important; }
+
+/* Deter casual copying of article content. Real limitation, worth being
+   honest about: view-source, browser dev tools, and screenshots always
+   remain possible for anyone determined - no website can fully prevent
+   that. This just removes the easy "select all, copy" path. */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+input,
+textarea,
+[contenteditable="true"],
+.textLayer,
+.textLayer span {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+html, body {
+  overscroll-behavior-y: none;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  overflow-x: hidden;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.shadow-press {
+  transition: filter 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.shadow-press:hover {
+  filter: brightness(1.05);
+}
+.shadow-press:active {
+  transform: translateY(1px);
+}
+
+/* ---------- page transition ---------- */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.page-transition {
+  animation: page-in 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------- staggered content reveal ---------- */
+@keyframes item-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.stagger-item {
+  animation: item-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/* ---------- skeleton loading shimmer ---------- */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--color-surface) 25%, #ecebe4 37%, var(--color-surface) 63%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- brand scrollbar, applied everywhere on the site that scrolls ---------- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-red) var(--color-surface);
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-red);
+  border-radius: 999px;
+  border: 2px solid var(--color-surface);
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-red-dark);
+}
+/* Cloudflare-style focus ring + smooth transitions on every form control. */
+input, select, textarea {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-red) !important;
+  box-shadow: 0 0 0 3px rgba(225, 21, 43, 0.12);
+  outline: none;
+}
+
+/* Search bars are the one exception - a colored ring/glow looks wrong on
+   a plain search field (Google/YouTube/every native search bar just
+   stays neutral on focus). Add .search-input to opt any input out of the
+   red focus ring above. */
+input.search-input:focus {
+  border-color: #ccc !important;
+  box-shadow: none;
+}
+
+/* Media protection, mobile: -webkit-touch-callout disables iOS's
+   long-press "Save Image" menu. Scoped to media only - text stays
+   selectable everywhere for copy/translate. */
+img, video, iframe {
+  -webkit-touch-callout: none;
+}
+
+/* Full-screen height with a real fallback for older Safari, which doesn't
+   understand the dvh unit at all - two declarations, the browser just
+   uses whichever it understands, no arbitrary Tailwind value can do this. */
+.h-screen-safe {
+  height: 100vh;
+}
+@supports (height: 100dvh) {
+  .h-screen-safe {
+    height: 100dvh;
+  }
+}
+
+.min-h-screen-safe-nav {
+  min-height: calc(100vh - 76px);
+}
+@supports (height: 100dvh) {
+  .min-h-screen-safe-nav {
+    min-height: calc(100dvh - 76px);
+  }
+}
+
+/* Mobile browsers (especially in-app webviews like Telegram/Facebook) can
+   let a fixed-position element visibly lag or gap during scroll because it
+   isn't promoted to its own compositor layer. Forcing one keeps it locked
+   to the viewport instead of momentarily trailing behind scroll content. */
+.fixed-shell {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+}

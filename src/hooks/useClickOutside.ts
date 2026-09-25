@@ -1,0 +1,14 @@
+import { useEffect, type RefObject } from 'react'
+
+export function useClickOutside(ref: RefObject<HTMLElement | null>, onOutside: () => void) {
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onOutside()
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ref])
+}
